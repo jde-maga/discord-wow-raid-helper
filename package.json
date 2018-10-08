@@ -17,6 +17,9 @@
     "url": "https://github.com/jde-maga/discord-wow-raid-helper/issues"
   },
   "homepage": "https://github.com/jde-maga/discord-wow-raid-helper#readme",
+  "engines": {
+    "node": "9.3.0"
+  },
   "dependencies": {
     "bufferutil": "^4.0.0",
     "discord.js": "^11.4.2",
