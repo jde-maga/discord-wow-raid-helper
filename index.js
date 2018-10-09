@@ -1,1 +1,2 @@
 require("./client");
+require("./server");

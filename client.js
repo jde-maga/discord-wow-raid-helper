@@ -8,7 +8,7 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.login("NDk0ODc2OTYyNzE2Nzc4NDk3.Do56Bw.l-OC0yqIbofq5QnO9UxSB6c8A38");
+client.login(process.env.BOT_KEY);
 
 client.on("message", msg => {
   if (msg.content.includes("!rh")) {
