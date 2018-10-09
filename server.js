@@ -1,3 +1,4 @@
+const https = require("https");
 const express = require("express");
 const app = express();
 
@@ -9,4 +10,8 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log("WoW Raid Helper server listening on 3000");
+  setInterval(() => {
+    https.get("https://wow-raid-helper.herokuapp.com/");
+    console.log("Stop Idling Heroku");
+  }, 300000);
 });
