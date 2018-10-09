@@ -18,12 +18,12 @@ class RaidHandler {
 
   addUser(type, user) {
     this[type].push(user);
-    console.log(`${type} - Added user ${user.username} (${user.id})`);
+    console.log(`${type} - Added user ${user.tag}`);
   }
 
   removeUser(type, user) {
     this[type].splice(this[type].findIndex(usr => usr.id === user.id), 1);
-    console.log(`${type} - Removed user ${user.username} (${user.id})`);
+    console.log(`${type} - Removed user ${user.tag}`);
   }
 
   displayRole(type) {
@@ -67,7 +67,7 @@ class RaidHandler {
   }
 
   listenReactions() {
-    this.client.on("messageReactionAdd", (reaction, user) => {
+    this.client.on("messageReactionAdd", async (reaction, user) => {
       if (reaction.message.id !== this.message.id || user.bot) return;
 
       if (emoji.which(reaction.emoji.name) === "shield") {
@@ -79,9 +79,10 @@ class RaidHandler {
       }
 
       if (emoji.which(reaction.emoji.name) === "wave") {
-        console.log(this.message);
         if (user.id === this.author.id) {
-          this.message.delete();
+          const idDel = this.message.id;
+          await this.message.delete();
+          console.log(`Deleted raid ${idDel}`);
         }
         return;
       }
@@ -102,13 +103,14 @@ class RaidHandler {
     });
   }
 
-  editMessage() {
-    this.message.edit(
+  async editMessage() {
+    await this.message.edit(
       `Derniere modification : ${moment().format("Do MMMM, HH:mm:ss")}`,
       {
         embed: this.generateEmbed()
       }
     );
+    console.log(`Edited raid ${this.message.id}`);
   }
 
   async createNewRaid(msg) {
@@ -120,6 +122,7 @@ class RaidHandler {
     await this.message.react(emoji.get("revolving_hearts"));
     await this.message.react(emoji.get("crossed_swords"));
     await this.message.react(emoji.get("wave"));
+    console.log(`Created new raid, id ${this.message.id}`);
   }
 }
 
