@@ -13,7 +13,7 @@ client.login(process.env.BOT_KEY);
 client.on("message", msg => {
   if (msg.content.includes("!rh")) {
     const officerRole = msg.guild.roles.find(
-      role => role.name.toLowerCase() === "officier"
+      role => role.name.toLowerCase() === "rh"
     ) || { id: null };
     if (msg.member._roles.find(id => id === officerRole.id)) {
       new RaidHandler(client, msg);
