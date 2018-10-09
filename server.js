@@ -5,7 +5,9 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.redirect(
+    "https://discordapp.com/oauth2/authorize?client_id=494876962716778497&scope=bot"
+  );
 });
 
 app.listen(PORT, () => {
