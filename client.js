@@ -6,6 +6,16 @@ const User = require("./User");
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
+  const channels = client.channels.filter(channel => channel.type === "text");
+  //console.log(channels.keys());
+  channels.forEach(channel => {
+    channel
+      .fetchMessages({ limit: 1 })
+      .then(msg => console.log(msg))
+      .catch(e => console.log("ko"));
+  });
+  //console.log(channels.map(channel => channel));
+  // console.log(channels["492749024894386176"].fetchMessages({ limit: 2 }));
 });
 
 client.login(process.env.BOT_KEY);

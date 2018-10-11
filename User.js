@@ -49,7 +49,11 @@ const specs = [
   },
   {
     class: "hunter",
-    specs: [""]
+    specs: ["bm", "beast master", "beast mastery", "mm", "marksman", "marksmanship", "sv", "surv", "survival"]
+  },
+  {
+    class: "mage",
+    specs: ""
   }
 ];
 

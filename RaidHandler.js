@@ -1,3 +1,4 @@
+const fs = require("fs");
 const emoji = require("node-emoji");
 const moment = require("moment");
 
@@ -17,13 +18,21 @@ class RaidHandler {
   }
 
   addUser(type, user) {
-    this[type].push(user);
-    console.log(`${type} - Added user ${user.tag}`);
+    if (this[type].find(e => e.id === user.id)) {
+      console.log(`${type} - user ${user.tag} already in group`);
+    } else {
+      this[type].push(user);
+      console.log(`${type} - Added user ${user.tag}`);
+    }
   }
 
   removeUser(type, user) {
-    this[type].splice(this[type].findIndex(usr => usr.id === user.id), 1);
-    console.log(`${type} - Removed user ${user.tag}`);
+    if (this[type].find(e => e.id === user.id)) {
+      this[type].splice(this[type].findIndex(usr => usr.id === user.id), 1);
+      console.log(`${type} - Removed user ${user.tag}`);
+    } else {
+      console.log(`${type} - user ${user.tag} not in group`);
+    }
   }
 
   displayRole(type) {
@@ -122,6 +131,8 @@ class RaidHandler {
     await this.message.react(emoji.get("revolving_hearts"));
     await this.message.react(emoji.get("crossed_swords"));
     await this.message.react(emoji.get("wave"));
+    fs.writeFile("./eventsID", "Hey there!");
+
     console.log(`Created new raid, id ${this.message.id}`);
   }
 }

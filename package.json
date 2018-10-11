@@ -11,8 +11,8 @@
     "type": "git",
     "url": "git+https://github.com/jde-maga/discord-wow-raid-helper.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sygnano",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jde-maga/discord-wow-raid-helper/issues"
   },
