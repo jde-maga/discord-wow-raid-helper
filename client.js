@@ -1,4 +1,7 @@
+const fs = require("fs");
+const Promise = require("bluebird");
 const Discord = require("discord.js");
+
 const client = new Discord.Client();
 
 const RaidHandler = require("./RaidHandler");
@@ -6,16 +9,24 @@ const User = require("./User");
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
-  const channels = client.channels.filter(channel => channel.type === "text");
-  //console.log(channels.keys());
-  channels.forEach(channel => {
-    channel
-      .fetchMessages({ limit: 1 })
-      .then(msg => console.log(msg))
-      .catch(e => console.log("ko"));
+
+  fs.readFile("./eventsID", "utf8", async (err, file) => {
+    const data = JSON.parse(file);
+    const newData = [];
+    await Promise.all(
+      data.map(async ({ channelID, messageID }) => {
+        const msg = await client.channels
+          .get(channelID)
+          .fetchMessage(messageID)
+          .catch(e => console.log(e));
+        if (msg) {
+          newData.push({ channelID, messageID });
+          new RaidHandler(client, msg, "existing");
+        }
+      })
+    );
+    fs.writeFileSync("./eventsID", JSON.stringify(newData));
   });
-  //console.log(channels.map(channel => channel));
-  // console.log(channels["492749024894386176"].fetchMessages({ limit: 2 }));
 });
 
 client.login(process.env.BOT_KEY);
@@ -26,17 +37,11 @@ client.on("message", msg => {
       role => role.name.toLowerCase() === "rh"
     ) || { id: null };
     if (msg.member._roles.find(id => id === officerRole.id)) {
-      new RaidHandler(client, msg);
+      new RaidHandler(client, msg, "new");
     } else {
       console.log(`Denied !rh to user ${msg.author.tag}`);
     }
   }
 });
-
-//client.on("message", msg => {
-//  if (msg.content.includes("!dd")) {
-//   const user = new User();
-//  }
-//});
 
 module.exports = client;

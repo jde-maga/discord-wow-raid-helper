@@ -5,16 +5,58 @@ const moment = require("moment");
 const client = require("./client");
 
 class RaidHandler {
-  constructor(client, msg) {
+  constructor(client, msg, type) {
     this.client = client;
-    this.author = msg.author;
     this.message = null;
     this.tanks = [];
     this.healers = [];
     this.dps = [];
 
+    if (type === "new") {
+      this.createNewRaid(msg);
+    } else if (type === "existing") {
+      this.message = msg;
+      this.hookRaid();
+    }
     this.listenReactions();
-    this.createNewRaid(msg);
+  }
+
+  async hookRaid() {
+    await this.message.reactions
+      .get(emoji.get("revolving_hearts"))
+      .fetchUsers()
+      .then(users => {
+        this.healers = users
+          .map(user => {
+            if (user.bot) return;
+            return this.client.users.get(user.id);
+          })
+          .filter(e => e);
+      });
+    await this.message.reactions
+      .get(emoji.get("shield"))
+      .fetchUsers()
+      .then(users => {
+        this.tanks = users
+          .map(user => {
+            if (user.bot) return;
+            return this.client.users.get(user.id);
+          })
+          .filter(e => e);
+      });
+    await this.message.reactions
+      .get(emoji.get("crossed_swords"))
+      .fetchUsers()
+      .then(users => {
+        this.dps = users
+          .map(user => {
+            if (user.bot) return;
+            return this.client.users.get(user.id);
+          })
+          .filter(e => e);
+      });
+    this.editMessage();
+    console.log(`Hooking up existing raid, ID ${this.message.id}`);
   }
 
   addUser(type, user) {
@@ -87,14 +129,6 @@ class RaidHandler {
         this.addUser("dps", user);
       }
 
-      if (emoji.which(reaction.emoji.name) === "wave") {
-        if (user.id === this.author.id) {
-          const idDel = this.message.id;
-          await this.message.delete();
-          console.log(`Deleted raid ${idDel}`);
-        }
-        return;
-      }
       this.editMessage();
     });
 
@@ -130,8 +164,20 @@ class RaidHandler {
     await this.message.react(emoji.get("shield"));
     await this.message.react(emoji.get("revolving_hearts"));
     await this.message.react(emoji.get("crossed_swords"));
-    await this.message.react(emoji.get("wave"));
-    fs.writeFile("./eventsID", "Hey there!");
+
+    fs.readFile("eventsID", "utf8", (err, file) => {
+      const data = JSON.parse(file);
+      fs.writeFileSync(
+        "./eventsID",
+        JSON.stringify([
+          ...data,
+          {
+            messageID: this.message.id,
+            channelID: this.message.channel.id
+          }
+        ])
+      );
+    });
 
     console.log(`Created new raid, id ${this.message.id}`);
   }
