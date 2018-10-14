@@ -14,6 +14,5 @@ app.listen(PORT, () => {
   console.log("WoW Raid Helper server listening on 3000");
   setInterval(() => {
     https.get("https://wow-raid-helper.herokuapp.com/");
-    console.log("Stop Idling Heroku");
-  }, 300000);
+  }, 600000);
 });

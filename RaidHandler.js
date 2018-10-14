@@ -1,8 +1,7 @@
-const fs = require("fs");
 const emoji = require("node-emoji");
 const moment = require("moment");
 
-const client = require("./client");
+const RaidEvent = require("./models/RaidEvent");
 
 class RaidHandler {
   constructor(client, msg, type) {
@@ -165,19 +164,11 @@ class RaidHandler {
     await this.message.react(emoji.get("revolving_hearts"));
     await this.message.react(emoji.get("crossed_swords"));
 
-    fs.readFile("eventsID", "utf8", (err, file) => {
-      const data = JSON.parse(file);
-      fs.writeFileSync(
-        "./eventsID",
-        JSON.stringify([
-          ...data,
-          {
-            messageID: this.message.id,
-            channelID: this.message.channel.id
-          }
-        ])
-      );
+    const newRaidEvent = new RaidEvent({
+      messageID: this.message.id,
+      channelID: this.message.channel.id
     });
+    newRaidEvent.save();
 
     console.log(`Created new raid, id ${this.message.id}`);
   }

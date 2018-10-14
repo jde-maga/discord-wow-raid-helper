@@ -1,35 +1,30 @@
-const fs = require("fs");
-const Promise = require("bluebird");
 const Discord = require("discord.js");
+
+const RaidHandler = require("./RaidHandler");
+
+const RaidEvent = require("./models/RaidEvent");
 
 const client = new Discord.Client();
 
-const RaidHandler = require("./RaidHandler");
-const User = require("./User");
+client.login(process.env.BOT_KEY);
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
 
-  fs.readFile("./eventsID", "utf8", async (err, file) => {
-    const data = JSON.parse(file);
-    const newData = [];
-    await Promise.all(
-      data.map(async ({ channelID, messageID }) => {
-        const msg = await client.channels
-          .get(channelID)
-          .fetchMessage(messageID)
-          .catch(e => console.log(e));
-        if (msg) {
-          newData.push({ channelID, messageID });
-          new RaidHandler(client, msg, "existing");
-        }
-      })
-    );
-    fs.writeFileSync("./eventsID", JSON.stringify(newData));
+  const eventsID = await RaidEvent.find({});
+  console.log(`Found ${eventsID.length} exisiting raid entries`);
+
+  eventsID.forEach(async event => {
+    const msg = await client.channels
+      .get(event.channelID)
+      .fetchMessage(event.messageID)
+      .catch(e => {
+        console.log(`error on ${event.messageID}, deleting`, e);
+        event.remove();
+      });
+    if (msg) new RaidHandler(client, msg, "existing");
   });
 });
-
-client.login(process.env.BOT_KEY);
 
 client.on("message", msg => {
   if (msg.content.includes("!rh")) {
