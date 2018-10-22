@@ -1,14 +1,16 @@
 const Discord = require("discord.js");
 
 const RaidHandler = require("./RaidHandler");
+const RosterHandler = require("./RosterHandler");
 
 const RaidEvent = require("./models/RaidEvent");
 
 const client = new Discord.Client();
 
 client.login(process.env.BOT_KEY);
-
+/*
 client.on("ready", async () => {
+  
   console.log(`Logged in as ${client.user.tag}`);
 
   const eventsID = await RaidEvent.find({});
@@ -38,5 +40,18 @@ client.on("message", msg => {
     }
   }
 });
+*/
+client.on("message", msg => {
+  if (msg.content.startsWith("!roster")) {
+    const officerRole = msg.guild.roles.find(
+      role => role.name.toLowerCase() === "rh"
+    ) || { id: null };
+    if (msg.member._roles.find(id => id === officerRole.id)) {
+      new RosterHandler(client, msg);
+    } else {
+      console.log(`Denied !roster to user ${msg.author.tag}`);
+    }
+  }
+})
 
 module.exports = client;
