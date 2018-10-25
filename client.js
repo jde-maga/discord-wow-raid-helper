@@ -8,6 +8,28 @@ const RaidEvent = require("./models/RaidEvent");
 const client = new Discord.Client();
 
 client.login(process.env.BOT_KEY);
+
+client.on("ready", async () => {
+  console.log(`Logged in as ${client.user.tag}`);
+
+  const eventsID = await RaidEvent.find({});
+  console.log(`Found ${eventsID.length} exisiting raid entries`);
+
+  eventsID.forEach(async event => {
+      const channel = await client.channels.get(event.channelID)
+      if (!channel) {
+        console.log("error")
+        return;
+      }
+      channel.fetchMessage(event.messageID)
+      .then((msg) => console.log(msg.id))
+      .catch(e => {
+        console.log("Caught Error", e);
+      });
+      //console.log(msg && msg.id);
+    });
+})
+
 /*
 client.on("ready", async () => {
   
