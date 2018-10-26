@@ -16,37 +16,19 @@ client.on("ready", async () => {
   console.log(`Found ${eventsID.length} exisiting raid entries`);
 
   eventsID.forEach(async event => {
-      const channel = await client.channels.get(event.channelID)
-      if (!channel) {
-        console.log("error")
-        return;
-      }
-      channel.fetchMessage(event.messageID)
-      .then((msg) => console.log(msg.id))
-      .catch(e => {
-        console.log("Caught Error", e);
-      });
-      //console.log(msg && msg.id);
-    });
-})
-
-/*
-client.on("ready", async () => {
-  
-  console.log(`Logged in as ${client.user.tag}`);
-
-  const eventsID = await RaidEvent.find({});
-  console.log(`Found ${eventsID.length} exisiting raid entries`);
-
-  eventsID.forEach(async event => {
-    const msg = await client.channels
-      .get(event.channelID)
-      .fetchMessage(event.messageID)
-      .catch(e => {
-        console.log(`error on ${event.messageID}, deleting`, e);
-        event.remove();
-      });
-    if (msg) new RaidHandler(client, msg, "existing");
+    const channel = await client.channels.get(event.channelID);
+    if (!channel) {
+      console.log("Channel not found, removing entry");
+      event.remove();
+    } else {
+      channel
+        .fetchMessage(event.messageID)
+        .then(msg => new RaidHandler(client, msg, "existing"))
+        .catch(e => {
+          console.log("Caught Error, removing entry : ", e);
+          event.remove();
+        });
+    }
   });
 });
 
@@ -62,7 +44,7 @@ client.on("message", msg => {
     }
   }
 });
-*/
+
 client.on("message", msg => {
   if (msg.content.startsWith("!roster")) {
     const officerRole = msg.guild.roles.find(
@@ -74,6 +56,6 @@ client.on("message", msg => {
       console.log(`Denied !roster to user ${msg.author.tag}`);
     }
   }
-})
+});
 
 module.exports = client;
